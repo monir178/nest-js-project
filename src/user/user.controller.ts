@@ -1,41 +1,37 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-
-
-const USERS = [
-    { id: 1, name: 'John Doe' },
-    { id: 2, name: 'Jack Doe' },
-    { id: 3, name: 'Bob Doe' },
-];
+import { UserService, type User } from './user.service';
 
 @Controller('user')
 export class UserController {
+    constructor(private readonly userService: UserService) {}
+
     // GET /user?name=...
     @Get()
-    getUsers(@Query('name') name?: string) {
-        if (name) {
-            return USERS.filter((user) =>
-                user.name.toLowerCase().includes(name.toLowerCase()),
-            );
-        }
-        return USERS;
+    getUsers(@Query('name') name?: string): User[] {
+        return this.userService.findAllUsers(name);
     }
+
     @Get(':id')
-    getUsersById(@Param('id') id: string) {
-        return { id, name: "John Doe" }
+    getUsersById(@Param('id', ParseIntPipe) id: number): User {
+        return this.userService.findOneUser(id);
     }
+
     @Post()
-    createUser(@Body() CreateUserDto: CreateUserDto) {
-        return { data: CreateUserDto, message: "User created successfully" };
+    createUser(@Body() createUserDto: CreateUserDto): User {
+        return this.userService.createUser(createUserDto);
     }
+
     @Put(':id')
-    updateUser(@Param('id') id: string, @Body() UpdateUserDto: UpdateUserDto) {
-        return { data: { id, ...UpdateUserDto }, message: "User updated successfully" };
+    updateUser(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto): User {
+        return this.userService.updateUser(id, updateUserDto);
     }
+
     @Delete(':id')
-    deleteUser(@Param('id') id: string) {
-        return { data: id, message: "User deleted successfully" };
+    deleteUser(@Param('id', ParseIntPipe) id: number) {
+        return this.userService.deleteUser(id);
     }
 }
+
 
