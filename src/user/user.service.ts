@@ -33,7 +33,7 @@ export class UserService {
         this.logger.log(`Find user by id: ${id}`);
         const user = this.users.find((u) => u.id === id);
         if (!user) {
-            throw new NotFoundException(`User with ID ${id} not found`);
+            throw new NotFoundException(`User not found`);
         }
         return user;
     }
